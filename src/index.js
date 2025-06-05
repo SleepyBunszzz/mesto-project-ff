@@ -1,3 +1,7 @@
+import './pages/index.css'; 
+import {initialCards} from './scripts/cards.js';
+
+// const avaterImage = new URL('./images/avatar.jpg', )
 // @todo: Темплейт карточки
 
 // @todo: DOM узлы
