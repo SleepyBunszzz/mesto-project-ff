@@ -1,7 +1,10 @@
 import './pages/index.css'; 
 import {initialCards} from './scripts/cards.js';
 
-// const avaterImage = new URL('./images/avatar.jpg', )
+
+const avaterimage = new URL('./images/avatar.jpg', import.meta.url);
+const logoimage = new URL('./images/logo.svg', import.meta.url);
+// cardTemplateContent.style.backround
 // @todo: Темплейт карточки
 
 // @todo: DOM узлы
