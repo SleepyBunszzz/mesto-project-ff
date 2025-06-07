@@ -1,4 +1,3 @@
-// universal modal handlers
 export function openModal(popup) {
   popup.classList.add('popup_is-opened', 'popup_is-animated');
   document.addEventListener('keydown', handleEscClose);
