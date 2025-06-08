@@ -10,6 +10,9 @@ const imagePopup = document.querySelector('.popup_type_image');
 const editBtn = document.querySelector('.profile__edit-button');
 const addBtn = document.querySelector('.profile__add-button');
 
+const titleEl = document.querySelector('.profile__title');
+const descEl = document.querySelector('.profile__description');
+
 const profileForm = profilePopup.querySelector('form[name="edit-profile"]');
 const nameInput = profileForm.querySelector('.popup__input_type_name');
 const descInput = profileForm.querySelector('.popup__input_type_description');
@@ -21,8 +24,6 @@ const urlInput = newCardForm.querySelector('.popup__input_type_url');
 const placesList = document.querySelector('.places__list');
 
 editBtn.addEventListener('click', () => {
-  const titleEl = document.querySelector('.profile__title');
-  const descEl = document.querySelector('.profile__description');
   nameInput.value = titleEl.textContent;
   descInput.value = descEl.textContent;
   openModal(profilePopup);
