@@ -11,3 +11,22 @@
 @import url('../blocks/popup/_is-animated/popup_is-animated.css');
 @import url('../blocks/popup/_is-opened/popup_is-opened.css');
 
+.popup__error {
+  color: red;
+  font-size: 12px;
+  display: none;
+}
+
+.popup__error_visible {
+  display: block;
+}
+
+.popup__input_type_error {
+  border: 1px solid red;
+}
+
+.popup__button_disabled {
+  background-color: #e5e5e5;
+  color: #a0a0a0;
+  cursor: default;
+}
