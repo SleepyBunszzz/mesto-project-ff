@@ -3,6 +3,7 @@ import { initialCards } from './components/cards.js';
 import { openModal, closeModal } from './components/modal.js';
 import { createCard } from './components/card.js';
 import { enableValidation, clearValidation } from './components/validation.js';
+import { getInitialCards } from './components/api.js';
 
 const profilePopup = document.querySelector('.popup_type_edit');
 const newCardPopup = document.querySelector('.popup_type_new-card');
@@ -105,3 +106,11 @@ const validationConfig = {
 };
 
 enableValidation(validationConfig);
+
+getInitialCards()
+  .then((result) => {
+    // обрабатываем результат
+  })
+  .catch((err) => {
+    console.log(err); // выводим ошибку в консоль
+  }); 
