@@ -1,9 +1,12 @@
 import './pages/index.css';
-import { initialCards } from './components/cards.js';
 import { openModal, closeModal } from './components/modal.js';
 import { createCard } from './components/card.js';
 import { enableValidation, clearValidation } from './components/validation.js';
-import { getInitialCards } from './components/api.js';
+import { getUserInfo, getInitialCards, updateUserInfo, addCard, updateAvatar } from './components/api.js';
+
+function renderLoading(isLoading, buttonElement, defaultText = 'Сохранить') {
+  buttonElement.textContent = isLoading ? 'Сохранение...' : defaultText;
+}
 
 const profilePopup = document.querySelector('.popup_type_edit');
 const newCardPopup = document.querySelector('.popup_type_new-card');
@@ -25,6 +28,13 @@ const urlInput = newCardForm.querySelector('.popup__input_type_url');
 
 const placesList = document.querySelector('.places__list');
 
+const avatarPopup = document.querySelector('.popup_type_avatar');
+const avatarForm = avatarPopup.querySelector('form[name="avatar-form"]');
+const avatarInput = avatarForm.querySelector('.popup__input_type_avatar-url');
+const avatarSubmitBtn = avatarForm.querySelector('.popup__button');
+const avatarEditBtn = document.querySelector('.profile__image');
+
+
 function handleDelete(cardEl) {
   cardEl.remove();
 }
@@ -42,6 +52,35 @@ function handlePreview({ name, link }) {
   openModal(imagePopup);
 }
 
+avatarEditBtn.addEventListener('click', () => {
+  avatarForm.reset();
+  clearValidation(avatarForm, validationConfig);
+  openModal(avatarPopup);
+});
+
+avatarForm.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+  const submitButton = avatarForm.querySelector('.popup__button');
+  const originalText = submitButton.textContent;
+  submitButton.textContent = 'Сохранение...';
+
+  const avatarUrl = avatarInput.value;
+
+  updateAvatar(avatarUrl)
+    .then((userData) => {
+      document.querySelector('.profile__image').style.backgroundImage = `url(${userData.avatar})`;
+      avatarForm.reset();
+      closeModal(avatarPopup);
+    })
+    .catch((err) => {
+      console.error('Ошибка обновления аватара:', err);
+    })
+    .finally(() => {
+      submitButton.textContent = originalText;
+    });
+});
+
+
 editBtn.addEventListener('click', () => {
   const titleEl = document.querySelector('.profile__title');
   const descEl = document.querySelector('.profile__description');
@@ -56,10 +95,27 @@ profileCloseBtn.addEventListener('click', () => closeModal(profilePopup));
 
 profileForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
-  document.querySelector('.profile__title').textContent = nameInput.value;
-  document.querySelector('.profile__description').textContent = descInput.value;
-  closeModal(profilePopup);
+  const submitButton = profileForm.querySelector('.popup__button');
+  const originalText = submitButton.textContent;
+  submitButton.textContent = 'Сохранение...';
+
+  const newName = nameInput.value;
+  const newAbout = descInput.value;
+
+  updateUserInfo({ name: newName, about: newAbout })
+    .then((userData) => {
+      document.querySelector('.profile__title').textContent = userData.name;
+      document.querySelector('.profile__description').textContent = userData.about;
+      closeModal(profilePopup);
+    })
+    .catch(err => {
+      console.error('Ошибка обновления профиля:', err);
+    })
+    .finally(() => {
+      submitButton.textContent = originalText;
+    });
 });
+
 
 addBtn.addEventListener('click', () => {
   clearValidation(newCardForm, validationConfig);
@@ -67,7 +123,37 @@ addBtn.addEventListener('click', () => {
   openModal(newCardPopup);
 });
 
-newCardCloseBtn.addEventListener('click', () => closeModal(newCardPopup));
+newCardForm.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+  const submitButton = newCardForm.querySelector('.popup__button');
+  const originalText = submitButton.textContent;
+  submitButton.textContent = 'Сохранение...';
+
+  const cardData = {
+    name: titleInput.value,
+    link: urlInput.value
+  };
+
+  addCard(cardData)
+    .then((newCard) => {
+      const cardEl = createCard(newCard, {
+        userId,
+        onDelete: handleDelete,
+        onLike: handleLike,
+        onPreview: handlePreview
+      });
+      placesList.prepend(cardEl);
+      newCardForm.reset();
+      closeModal(newCardPopup);
+    })
+    .catch((err) => {
+      console.error('Ошибка добавления карточки:', err);
+    })
+    .finally(() => {
+      submitButton.textContent = originalText;
+    });
+});
+
 
 imageCloseBtn.addEventListener('click', () => closeModal(imagePopup));
 
@@ -87,14 +173,6 @@ newCardForm.addEventListener('submit', (evt) => {
   closeModal(newCardPopup);
 });
 
-initialCards.forEach((data) => {
-  const cardEl = createCard(data, {
-    onDelete: handleDelete,
-    onLike: handleLike,
-    onPreview: handlePreview
-  });
-  placesList.append(cardEl);
-});
 
 const validationConfig = {
   formSelector: '.popup__form',
@@ -107,10 +185,32 @@ const validationConfig = {
 
 enableValidation(validationConfig);
 
-getInitialCards()
-  .then((result) => {
-    // обрабатываем результат
+let userId = null;
+
+Promise.all([getUserInfo(), getInitialCards()])
+  .then(([userData, cards]) => {
+    // 1. Сохраняем userId
+    userId = userData._id;
+    
+    userData.name = 'Жак-Ив Кусто';
+    userData.about = 'Исследователь океана';
+    // 2. Обновляем профиль
+    document.querySelector('.profile__title').textContent = userData.name;
+    document.querySelector('.profile__description').textContent = userData.about;
+    document.querySelector('.profile__image').style.backgroundImage = `url(${userData.avatar})`;
+
+    // 3. Добавляем карточки
+    
+    cards.forEach(cardData => {
+      const cardEl = createCard(cardData, {
+        userId,
+        onDelete: handleDelete,
+        onLike: handleLike,
+        onPreview: handlePreview
+      });
+      placesList.append(cardEl);
+    });
   })
   .catch((err) => {
-    console.log(err); // выводим ошибку в консоль
-  }); 
+    console.error('Ошибка при загрузке данных:', err);
+  });
