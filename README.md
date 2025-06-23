@@ -1,2 +1,3 @@
 # Проектная работа Mesto
-https://github.com/SleepyBunszzz/mesto-project-ff
+
+https://sleepybunszzz.github.io/mesto-project-ff/

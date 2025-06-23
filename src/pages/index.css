@@ -11,3 +11,51 @@
 @import url('../blocks/popup/_is-animated/popup_is-animated.css');
 @import url('../blocks/popup/_is-opened/popup_is-opened.css');
 
+.popup__error {
+  color: red;
+  font-size: 12px;
+  display: none;
+}
+
+.popup__error_visible {
+  display: block;
+}
+
+.popup__input_type_error {
+  border: 1px solid red;
+}
+
+.popup__button_disabled {
+  background-color: #e5e5e5;
+  color: #a0a0a0;
+  cursor: default;
+}
+
+.profile__image {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.profile__image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  background-image: url('../images/edit-icon.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 24px 24px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  border-radius: 50%;
+}
+
+.profile__image:hover::after {
+  opacity: 1;
+}
