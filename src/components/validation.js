@@ -13,9 +13,7 @@ function hideInputError(formElement, inputElement, config) {
 }
 
 function isValid(formElement, inputElement, config) {
-  const pattern = /^[А-Яа-яЁёA-Za-z\s\-]+$/;
-
-  if (inputElement.hasAttribute('pattern') && !pattern.test(inputElement.value)) {
+  if (inputElement.validity.patternMismatch) {
     inputElement.setCustomValidity(inputElement.dataset.errorMessage);
   } else {
     inputElement.setCustomValidity('');
@@ -27,6 +25,7 @@ function isValid(formElement, inputElement, config) {
     hideInputError(formElement, inputElement, config);
   }
 }
+
 
 function hasInvalidInput(inputList) {
   return inputList.some((inputElement) => !inputElement.validity.valid);

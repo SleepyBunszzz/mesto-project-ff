@@ -23,13 +23,16 @@ const descEl = document.querySelector('.profile__description');
 const profileForm = profilePopup.querySelector('form[name="edit-profile"]');
 const nameInput = profileForm.querySelector('.popup__input_type_name');
 const descInput = profileForm.querySelector('.popup__input_type_description');
+const profileSubmitButton = profileForm.querySelector('.popup__button');
 
 const newCardForm = newCardPopup.querySelector('form[name="new-place"]');
 const titleInput = newCardForm.querySelector('.popup__input_type_card-name');
 const urlInput = newCardForm.querySelector('.popup__input_type_url');
+const newCardSubmitButton = newCardForm.querySelector('.popup__button');
 
 const avatarForm = avatarPopup.querySelector('form[name="avatar-form"]');
 const avatarInput = avatarForm.querySelector('.popup__input_type_avatar-url');
+const avatarSubmitButton = avatarForm.querySelector('.popup__button');
 
 const placesList = document.querySelector('.places__list');
 
@@ -52,14 +55,6 @@ function handlePreview({ name, link }) {
   openModal(imagePopup);
 }
 
-function handleDelete(cardEl) {
-  cardEl.remove();
-}
-
-function handleLike(button) {
-  button.classList.toggle('card__like-button_is-active');
-}
-
 editBtn.addEventListener('click', () => {
   nameInput.value = titleEl.textContent;
   descInput.value = descEl.textContent;
@@ -69,17 +64,16 @@ editBtn.addEventListener('click', () => {
 
 profileForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
-  const submitButton = profileForm.querySelector('.popup__button');
-  renderLoading(true, submitButton);
+  renderLoading(true, profileSubmitButton);
 
   updateUserInfo({ name: nameInput.value, about: descInput.value })
     .then((userData) => {
-      document.querySelector('.profile__title').textContent = userData.name;
-      document.querySelector('.profile__description').textContent = userData.about;
+      titleEl.textContent = userData.name;
+      descEl.textContent = userData.about;
       closeModal(profilePopup);
     })
     .catch((err) => console.error('Ошибка обновления профиля:', err))
-    .finally(() => renderLoading(false, submitButton));
+    .finally(() => renderLoading(false, profileSubmitButton));
 });
 
 addBtn.addEventListener('click', () => {
@@ -90,15 +84,12 @@ addBtn.addEventListener('click', () => {
 
 newCardForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
-  const submitButton = newCardForm.querySelector('.popup__button');
-  renderLoading(true, submitButton);
+  renderLoading(true, newCardSubmitButton);
 
   addCard({ name: titleInput.value, link: urlInput.value })
     .then((newCard) => {
       const cardEl = createCard(newCard, {
         userId,
-        onDelete: handleDelete,
-        onLike: handleLike,
         onPreview: handlePreview
       });
       placesList.prepend(cardEl);
@@ -106,7 +97,7 @@ newCardForm.addEventListener('submit', (evt) => {
       newCardForm.reset();
     })
     .catch((err) => console.error('Ошибка добавления карточки:', err))
-    .finally(() => renderLoading(false, submitButton));
+    .finally(() => renderLoading(false, newCardSubmitButton));
 });
 
 avatarEditBtn.addEventListener('click', () => {
@@ -117,17 +108,16 @@ avatarEditBtn.addEventListener('click', () => {
 
 avatarForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
-  const submitButton = avatarForm.querySelector('.popup__button');
-  renderLoading(true, submitButton);
+  renderLoading(true, avatarSubmitButton);
 
   updateAvatar(avatarInput.value)
     .then((userData) => {
-      document.querySelector('.profile__image').style.backgroundImage = `url(${userData.avatar})`;
+      avatarEditBtn.style.backgroundImage = `url(${userData.avatar})`;
       avatarForm.reset();
       closeModal(avatarPopup);
     })
     .catch((err) => console.error('Ошибка обновления аватара:', err))
-    .finally(() => renderLoading(false, submitButton));
+    .finally(() => renderLoading(false, avatarSubmitButton));
 });
 
 const validationConfig = {
@@ -146,15 +136,13 @@ let userId = null;
 Promise.all([getUserInfo(), getInitialCards()])
   .then(([userData, cards]) => {
     userId = userData._id;
-    document.querySelector('.profile__title').textContent = userData.name;
-    document.querySelector('.profile__description').textContent = userData.about;
-    document.querySelector('.profile__image').style.backgroundImage = `url(${userData.avatar})`;
+    titleEl.textContent = userData.name;
+    descEl.textContent = userData.about;
+    avatarEditBtn.style.backgroundImage = `url(${userData.avatar})`;
 
     cards.forEach((cardData) => {
       const cardEl = createCard(cardData, {
         userId,
-        onDelete: handleDelete,
-        onLike: handleLike,
         onPreview: handlePreview
       });
       placesList.append(cardEl);

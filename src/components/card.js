@@ -48,3 +48,4 @@ export function createCard({ name, link, owner, _id, likes = [] }, { userId, onP
 
   return card;
 }
+
